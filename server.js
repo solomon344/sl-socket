@@ -3,7 +3,9 @@ import { createServer } from 'http'
 import "dotenv/config"
 
 // Create HTTP server and Socket.IO server
-const httpServer = createServer()
+const httpServer = createServer((req, res) => {
+  res.end('<h1>WebSocket Server is running</h1>')
+})
 const io = new Server(httpServer, {
   cors: {
     origin:"*", // or your frontend URL
@@ -52,7 +54,9 @@ io.on('connection', socket => {
 
 
 
-httpServer.listen(process.env.SOCKET_PORT,"0.0.0.0", () => {
+
+
+httpServer.listen(process.env.SOCKET_PORT, () => {
   console.log(`🚀 WebSocket server running on port ${process.env.SOCKET_PORT}`)
 })
 
