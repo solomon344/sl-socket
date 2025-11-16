@@ -17,7 +17,7 @@ const io = new Server(httpServer, {
 
 // Connection event
 io.on('connection', socket => {
-  socket.
+  
   console.log('🧠 WebSocket connected:', socket.id)
   
 //  connected socket instance sends a scrape:start event
@@ -28,18 +28,32 @@ io.on('connection', socket => {
     socket.emit("scrape:start")
   })
 
-    // connected socket instance sends a scrape:completed event
-  socket.on("scrape:completed",()=>{
+ 
 
-    // re-emit the scrape:completed event to the connected socket instance
-    socket.emit("scrape:completed")
+
+  // Listen to scrape complete events
+  socket.on("scrape:completed", (data) => {
+    const {projectId,message,status} = data
+    console.log("recieved scrape completed event for projectId:",projectId)
+
+    // re-emit the scrape:completed event to all connected clients
+    io.emit(`scrape:${projectId}`,{status,message});
   })
+  
+  // Listen to scrape failed events
+  socket.on("scrape:failed", (data) => {
+    const {projectId,message,status} = data
+
+    // re-emit the scrape:failed event to all connected clients
+    io.emit(`scrape:${projectId}:failed`,{status, message});
+})
+
 })
 
 
 
-httpServer.listen(4000,"0.0.0.0", () => {
-  console.log('🚀 WebSocket server running on port 4000')
+httpServer.listen(process.env.SOCKET_PORT,"0.0.0.0", () => {
+  console.log(`🚀 WebSocket server running on port ${process.env.SOCKET_PORT}`)
 })
 
 
