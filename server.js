@@ -13,9 +13,8 @@ const io = new Server(httpServer, {
 })
 
 
-
-
 // Socket.IO event listeners
+
 
 // Connection event
 io.on('connection', socket => {
@@ -27,27 +26,25 @@ io.on('connection', socket => {
     console.log("recieved scrape start event")
 
     // re-emit the scrape:start event to the connected socket instance
-    socket.emit("scrape:start")
+    io.emit("scrape:start")
   })
-
- 
 
 
   // Listen to scrape complete events
   socket.on("scrape:completed", (data) => {
-    const {projectId,message,status} = data
-    console.log("recieved scrape completed event for projectId:",projectId)
+    const {scrapeId,message,status} = data
+    console.log("recieved scrape completed event for scrapeId:",scrapeId)
 
     // re-emit the scrape:completed event to all connected clients
-    io.emit(`scrape:${projectId}`,{status,message});
+    io.emit("scrape:completed",{status,message,scrapeId});
   })
-  
+
   // Listen to scrape failed events
   socket.on("scrape:failed", (data) => {
-    const {projectId,message,status} = data
+    const {scrapeId,message,status} = data
 
     // re-emit the scrape:failed event to all connected clients
-    io.emit(`scrape:${projectId}:failed`,{status, message});
+    io.emit("scrape:failed",{status, message,scrapeId});
 })
 
 })
