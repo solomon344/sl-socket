@@ -73,8 +73,16 @@ socket.on("scrape:parsed",(data)=>{
 
 
 
-httpServer.listen(process.env.SOCKET_PORT, () => {
-  console.log(`🚀 WebSocket server running on port ${process.env.SOCKET_PORT}`)
+// Falls back to 4000 if SOCKET_PORT isn't set in the environment — without
+// this, Node's http.Server binds to a random OS-assigned port instead
+// (Server.listen's documented behavior when the port argument is undefined),
+// which is exactly what happened when .env was dockerignored and never
+// reached the container: the process came up fine, but Dokploy's reverse
+// proxy was pointed at a fixed port nothing was actually listening on.
+const PORT = process.env.SOCKET_PORT || 4000;
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 WebSocket server running on port ${PORT}`)
 })
 
 
